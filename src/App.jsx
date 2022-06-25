@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import RutaProtegida from "./layouts/RutaProtegida";
-import Login from "./paginas/login";
+import Login from "./paginas/Login";
 import Registrar from "./paginas/Registrar";
 import OlvidePassword from "./paginas/OlvidePassword";
 import NuevoPassword from "./paginas/NuevoPassword";

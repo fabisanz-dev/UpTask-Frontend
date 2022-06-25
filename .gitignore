@@ -1,4 +1,6 @@
 .env
+test
+test.*
 
 # Logs
 logs
