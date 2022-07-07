@@ -437,9 +437,10 @@ const ProyectosProvider = ({ children }) => {
      * proyectoActualizado.tareas = [...proyectoActualizado.tareas, tarea];
     */
     proyectoActualizado.tareas.unshift(tarea)
-    proyectoActualizado.tareas.pop()
-    //setTareasCount(tareasCountActualizado++);
    
+    if(proyectoActualizado.tareas.length > 3){
+      proyectoActualizado.tareas.pop()
+    }
 
     setProyectoItem(proyectoActualizado);
   };
@@ -452,8 +453,10 @@ const ProyectosProvider = ({ children }) => {
       (tareaState) => tareaState._id !== tarea._id
     );
     //actualizar tareas restantes - paginacion 
-    proyectoActualizado.tareas = [...tareasRestantes, proyectoActualizado.tareas];
-    proyectoActualizado.tareas = proyectoActualizado.tareas.slice(0, 3);
+    proyectoActualizado.tareas = Object.assign(proyectoActualizado.tareas, tareasRestantes);
+    //proyectoActualizado.tareas = proyectoActualizado.tareas.slice(0, 3);
+    //console.log(proyectoActualizado.tareas)
+    
     setProyectoItem(proyectoActualizado)
   };
 
