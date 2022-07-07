@@ -455,8 +455,10 @@ const ProyectosProvider = ({ children }) => {
     //actualizar tareas restantes - paginacion 
     proyectoActualizado.tareas = Object.assign(proyectoActualizado.tareas, tareasRestantes);
     //proyectoActualizado.tareas = proyectoActualizado.tareas.slice(0, 3);
-    //console.log(proyectoActualizado.tareas)
-    
+    if(proyectoActualizado.tareas.length > 3){
+      proyectoActualizado.tareas.pop()
+    }
+
     setProyectoItem(proyectoActualizado)
   };
 
