@@ -23,6 +23,10 @@ const ProyectosProvider = ({ children }) => {
     useState(false);
   //buscador
   const [buscador, setBuscador] = useState(false);
+  //paginacion
+  const [page, setPage] = useState(1);
+  const [pageCount, setPageCount] = useState(0);
+  const [tareasCount, setTareasCount] = useState(0);
 
   useEffect(() => {
     socket = io(import.meta.env.VITE_URL_BACK);
@@ -113,7 +117,6 @@ const ProyectosProvider = ({ children }) => {
       };
       try {
         const { data } = await clienteAxios.get("/proyectos/", config);
-        console.log(data);
         setProyectos(data);
       } catch (error) {
         console.log(error);
@@ -122,7 +125,7 @@ const ProyectosProvider = ({ children }) => {
     obtenerProyectos();
   }, []);
 
-  const obtenerProyecto = async (id) => {
+  const obtenerProyecto = async (id, _page) => {
     const token = sessionStorage.getItem("token-user");
     if (!token) return;
     const config = {
@@ -133,9 +136,13 @@ const ProyectosProvider = ({ children }) => {
     };
     setCargando(true);
     try {
-      const { data } = await clienteAxios.get(`/proyectos/${id}`, config);
-      //setear data
-      setProyectoItem(data);
+      const { data } = await clienteAxios.get(`/proyectos/${id}?page=${_page}`, config);
+      setTimeout(() => {
+        //data + pagination de tareas
+        setProyectoItem(data.proyecto);
+        setPageCount(data.pagination.pageCount);
+        setTareasCount(data.pagination.count);
+      }, 200);
     } catch (error) {
       navigate("/proyectos");
       alertaFn({
@@ -150,7 +157,6 @@ const ProyectosProvider = ({ children }) => {
 
   //Eliminar proyecto
   const eliminarProyecto = async (id) => {
-    console.log("Eliminando proyecto...", id);
     const token = sessionStorage.getItem("token-user");
     if (!token) return;
     const config = {
@@ -193,7 +199,6 @@ const ProyectosProvider = ({ children }) => {
    * @param {*} tarea
    */
   const recibirDatosTareas = async (tarea) => {
-    console.log(tarea);
     if (!tarea.id) {
       await agregarTarea(tarea);
     } else {
@@ -213,11 +218,14 @@ const ProyectosProvider = ({ children }) => {
     try {
       const { data } = await clienteAxios.post("/tareas", tarea, config);
 
+      //actualizar states de alerta, formulario y paginacion
       setAlerta({});
       setModalFormularioTarea(false);
+      setTareasCount(data.tareasCount);
+      setPageCount(data.pageCount);
 
       //socket emitir data tarea creado
-      socket.emit("nueva-tarea", data);
+      socket.emit("nueva-tarea", data.tareaAlmacenada);
     } catch (error) {
       console.log(error);
     }
@@ -273,6 +281,9 @@ const ProyectosProvider = ({ children }) => {
         config
       );
 
+      //actualizar paginacion
+      setTareasCount(data.tareasCount)
+      setPageCount(data.pageCount);
       setAlerta({
         msg: data.msg,
         error: false,
@@ -282,7 +293,7 @@ const ProyectosProvider = ({ children }) => {
       }, 2000);
 
       //socket
-      socket.emit("eliminar-tarea", tarea);
+      socket.emit("eliminar-tarea", tarea, data.tareasRestantes);
 
       setModalEliminarTarea(false);
       setTarea({});
@@ -322,7 +333,6 @@ const ProyectosProvider = ({ children }) => {
    * @param {*} email
    */
   const agregarColaborador = async (email) => {
-    console.log(email);
     const token = sessionStorage.getItem("token-user");
     if (!token) return;
     const config = {
@@ -337,7 +347,6 @@ const ProyectosProvider = ({ children }) => {
         email,
         config
       );
-      console.log(data);
       alertaFn({
         msg: data.msg,
         error: false,
@@ -422,17 +431,30 @@ const ProyectosProvider = ({ children }) => {
   const submitTareaProyectoSocket = (tarea) => {
     //actualizar el state de proyectoItem cuando se agrega un nueva tarea
     const proyectoActualizado = { ...proyectoItem };
-    proyectoActualizado.tareas = [...proyectoActualizado.tareas, tarea];
+    //let tareasCountActualizado = tareasCount;
+    /**
+     * Cambios por la paginacion
+     * proyectoActualizado.tareas = [...proyectoActualizado.tareas, tarea];
+    */
+    proyectoActualizado.tareas.unshift(tarea)
+    proyectoActualizado.tareas.pop()
+    //setTareasCount(tareasCountActualizado++);
+   
+
     setProyectoItem(proyectoActualizado);
   };
 
-  const eliminarTareaProyectoSocket = (tarea) => {
+  const eliminarTareaProyectoSocket = (tareas) => {
+    const {tarea, tareasRestantes} = tareas;
     //actualizar el state proyectosItem para quitar la tarea eliminada
     const proyectoActualizado = { ...proyectoItem };
     proyectoActualizado.tareas = proyectoActualizado.tareas.filter(
       (tareaState) => tareaState._id !== tarea._id
     );
-    setProyectoItem(proyectoActualizado);
+    //actualizar tareas restantes - paginacion 
+    proyectoActualizado.tareas = [...tareasRestantes, proyectoActualizado.tareas];
+    proyectoActualizado.tareas = proyectoActualizado.tareas.slice(0, 3);
+    setProyectoItem(proyectoActualizado)
   };
 
   const actualizarTareaProyectoSocket = (tarea) => {
@@ -453,10 +475,10 @@ const ProyectosProvider = ({ children }) => {
   };
 
   const cerrarSesionProyectos = () => {
-    setProyectos([])
-    setProyectoItem({})
-    setAlerta({})
-  }
+    setProyectos([]);
+    setProyectoItem({});
+    setAlerta({});
+  };
 
   return (
     <ProyectosContext.Provider
@@ -490,7 +512,11 @@ const ProyectosProvider = ({ children }) => {
         eliminarTareaProyectoSocket,
         actualizarTareaProyectoSocket,
         actualizarTareaEstadoProyectoSocket,
-        cerrarSesionProyectos
+        cerrarSesionProyectos,
+        page,
+        setPage,
+        pageCount,
+        tareasCount
       }}
     >
       {children}

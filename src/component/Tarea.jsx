@@ -6,6 +6,7 @@ const Tarea = ({ tarea }) => {
   const { nombre, descripcion, fechaEntrega, estado, prioridad, _id, completado } = tarea;
   const { handleModalEditarTarea, handleModalEliminarTarea, completarTarea } = useProyectos();
   const isAdmin = useAdmin();
+
   return (
     <div className="border-b p-5 flex justify-between items-center">
       <div className="flex flex-col items-start">
