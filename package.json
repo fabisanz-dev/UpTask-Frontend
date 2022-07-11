@@ -11,6 +11,8 @@
     "@headlessui/react": "^1.6.4",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
+    "flowbite": "^1.4.7",
+    "flowbite-react": "^0.0.27",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",
