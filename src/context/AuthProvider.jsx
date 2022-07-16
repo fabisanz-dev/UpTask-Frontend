@@ -75,7 +75,6 @@ const AuthProvider = ({children}) => {
 			const { data } = await clienteAxios.put(`usuarios/perfil`, formData, config);
 			setCargandoImg(true);
 			setImgUploaded(data.imagen);
-			console.log(data);
 		} catch (error) {
 			console.log('img-profile', error)
 		}

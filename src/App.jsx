@@ -14,8 +14,6 @@ import Proyecto from "./paginas/Proyecto";
 import ProyectoEditar from "./paginas/ProyectoEditar";
 import NuevoColaborador from "./paginas/NuevoColaborador";
 
-RutaProtegida;
-
 function App() {
   return (
     <BrowserRouter>

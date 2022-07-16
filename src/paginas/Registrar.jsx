@@ -37,7 +37,7 @@ const Registrar = () => {
     }
     setAlerta({});
     //enviar datos a la api
-    console.log('procesando', import.meta.env.VITE_API_URL)
+
     try {
       const {data} = await clienteAxios.post('/usuarios', {
         nombre, email, password

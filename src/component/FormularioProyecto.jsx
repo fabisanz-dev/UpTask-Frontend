@@ -21,7 +21,7 @@ const FormularioProyecto = () => {
       setFechaEntrega(proyectoItem.fechaEntrega?.split('T')[0]);
       setCliente(proyectoItem.cliente);
     }else{
-      console.log('creamdo...')
+      console.log('creando...')
     }
   }, [params]);
 
@@ -30,7 +30,6 @@ const FormularioProyecto = () => {
     console.log([id, nombre, descripcion, fechaEntrega, cliente])
  
 	if([nombre, descripcion, fechaEntrega, cliente].includes('')){
-		console.log('Estos campos son obligatorios');
 		alertaFn({
 			msg: 'Estos campos son obligatorios',
 			error: true

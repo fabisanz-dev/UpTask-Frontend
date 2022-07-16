@@ -5,7 +5,6 @@ import Loading from "./Loading";
 
 const Sidebar = () => {
   const { auth, uploadImg, imgUploaded, cargandoImg } = useAuth(); 
-  console.log(auth);
   const [show, setShow] = useState(false);
   const [selectedFile, setSelectedFile] = useState("");
   const [imgTemp, setImgTemp] = useState("");
@@ -78,7 +77,7 @@ const Sidebar = () => {
 
       <div className="flex justify-center mt-1">
         <div
-          className={` bg-white divide-y divide-gray-100 rounded shadow w-44
+          className={`bg-white divide-y divide-gray-100 rounded shadow w-44
 		dark:bg-gray-700 dark:divide-gray-600
 		${show ? "block" : "hidden"} flex items-center flex-col
 		`}
