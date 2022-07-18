@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import ImgProfilePlaceholder from "../../../Backend/helpers/ImgProfilePlaceholder";
 import useAuth from "../hooks/useAuth";
+import useProyectos from "../hooks/useProyectos";
 import Loading from "./Loading";
 
 const Sidebar = () => {
-  const { auth, uploadImg, imgUploaded, cargandoImg } = useAuth(); 
+  const { auth, uploadImg, imgUploaded, cargandoImg, mensajeImg } = useAuth(); 
   const [show, setShow] = useState(false);
   const [selectedFile, setSelectedFile] = useState("");
   const [imgTemp, setImgTemp] = useState("");
+  const [msgTemp, setMsgTemp] = useState("");
 
-  
+  const { handleBuscador, cerrarSesionProyectos } = useProyectos()
+  const { cerrarSesionAuth } = useAuth()
+ 
   const handleMenuProfile = () => {
     show ? setShow(false) : setShow(true);
   };
@@ -38,6 +43,14 @@ const Sidebar = () => {
 
   //img temp o subida
   const imgConfirm = `${imgUploaded ? imgUploaded : imgTemp}`;
+
+  //cerrar sesion
+  const handleCerrarSesion = () => {
+    cerrarSesionProyectos()
+    cerrarSesionAuth()
+   }
+
+   
   return (
     <aside className="md:w-1/3 lg:w-1/5 xl:w-1/6 px-5 py-2 border-r">
       <p className="text-xl font-bold">Hola: {auth.usuario.nombre}</p>
@@ -48,7 +61,7 @@ const Sidebar = () => {
         Crear Proyecto
       </Link>
       <div className="flex justify-center mt-10" onClick={handleMenuProfile}>
-        <div className="relative w-32 h-32 border overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+        <div className="relative w-32 h-32 border overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer">
         {
           cargandoImg ? (<span className="w-32 h-32 flex justify-center items-center"><Loading /></span> )
           : (selectedFile || imgUploaded ) ? (
@@ -58,18 +71,7 @@ const Sidebar = () => {
               alt='image-profile'
             />
           ) : (
-            <svg
-              className="absolute w-32 h-32 text-gray-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
+            <ImgProfilePlaceholder />
           )
         }
         </div>
@@ -91,25 +93,37 @@ const Sidebar = () => {
             aria-labelledby="dropdownInformationButton"
           >
             <li>
+            { !cargandoImg ?
+              (
                 <label
-                  htmlFor="dropzone-file"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                htmlFor="dropzone-file"
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
                 >
                   <input
                     id="dropzone-file"
                     type="file"
                     className="hidden"
                     onChange={onFileChange}
-                    placeholder="test"
+                    placeholder="cambiar imagen"
                   />
-                  Cambiar imagen 
+                  Cambiar imagen
                 </label>
+              ) :
+               (
+                <label
+                className="block px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  {mensajeImg ? 'Imagen Actualizada!✔️' : 'Actualizando imagen ...'}
+                </label>
+              ) }
+
             </li>
           </ul>
           <div className="py-1">
             <a
               href="#"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+              className="block px-4 py-2 text-sm text-slate-100 bg-red-600 rounded-lg hover:bg-red-500"
+              onClick={handleCerrarSesion}
             >
               Cerrar sesion
             </a>

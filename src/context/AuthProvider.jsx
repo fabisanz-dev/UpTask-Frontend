@@ -9,6 +9,7 @@ const AuthProvider = ({children}) => {
 	const [cargando, setCargando] = useState(true);
 	const [imgUploaded, setImgUploaded] = useState("");
 	const [cargandoImg, setCargandoImg] = useState(false);
+	const [mensajeImg, setMensajeImg] = useState("");
 
 
 	const navigate = useNavigate();
@@ -75,11 +76,17 @@ const AuthProvider = ({children}) => {
 			const { data } = await clienteAxios.put(`usuarios/perfil`, formData, config);
 			setCargandoImg(true);
 			setImgUploaded(data.imagen);
+			setTimeout(() => {
+				setMensajeImg(data.mensaje);
+			}, 1000);
+			
+			
 		} catch (error) {
 			console.log('img-profile', error)
 		}
 		setTimeout(() => {
 			setCargandoImg(false);
+			setMensajeImg('');
 		}, 2000);
 		
 
@@ -94,7 +101,8 @@ const AuthProvider = ({children}) => {
 				cerrarSesionAuth,
 				uploadImg,
 				imgUploaded,
-				cargandoImg
+				cargandoImg, 
+				mensajeImg
 			}}
 		>
 			{children}
